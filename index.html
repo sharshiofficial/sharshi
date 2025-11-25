@@ -1,209 +1,111 @@
+import React from "react";
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sharshi Science Heritage – Futuristic Ecommerce</title>
+// Added rotating mandala background
+export default function Home() {
+  return (
+    <>
+      {/* BACKGROUND MANDALA */}
+      <div className="absolute inset-0 pointer-events-none opacity-10 animate-spin-slow">
+        <img
+          src="/mnt/data/Screenshot.png"
+          alt="mandala"
+          className="w-full h-full object-contain opacity-20"
+        />
+      </div>
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: radial-gradient(circle at top, #ff1a1a, #000);
-        color: white;
-        overflow-x: hidden;
-    }
+      {/* MAIN PAGE */}
+      <div className="relative min-h-screen w-full bg-gradient-to-b from-red-700 to-black text-white">
+        {/* Header */}
+        <header className="p-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <h1 className="text-6xl font-extrabold tracking-[0.2em] bg-gradient-to-r from-yellow-300 via-orange-400 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(255,160,80,0.9)] animate-pulse-slow uppercase">
+              S H A S H R S H I
+            </h1>
+          </div>
+        </header>
 
-    /* Navigation */
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 40px;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(7px);
-        position: sticky;
-        top: 0;
-        z-index: 999;
-    }
-    nav h1 {
-        font-size: 28px;
-        font-weight: 700;
-        background: linear-gradient(to right, red, white);
-        -webkit-background-clip: text;
-        color: transparent;
-    }
-    nav ul {
-        list-style: none;
-        display: flex;
-        gap: 25px;
-    }
-    nav ul li a {
-        text-decoration: none;
-        color: white;
-        font-size: 18px;
-        transition: 0.3s;
-    }
-    nav ul li a:hover {
-        color: red;
-    }
+        {/* Navigation Panel (bottom) */}
+        <nav
+          aria-label="Primary navigation"
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full flex gap-6 items-center border border-white/10 shadow-lg "
+        >
+          <a href="#home" className="hover:text-orange-400 transition">Home</a>
+          <a href="#products" className="hover:text-orange-400 transition">Products</a>
+          <a href="#services" className="hover:text-orange-400 transition">Services</a>
+          <a href="#contact" className="hover:text-orange-400 transition">Contact</a>
+        </nav>
 
-    /* Hero Section */
-    .hero {
-        text-align: center;
-        padding: 140px 20px;
-        background: rgba(0,0,0,0.25);
-        backdrop-filter: blur(5px);
-    }
-    .hero h2 {
-        font-size: 56px;
-        margin-bottom: 10px;
-    }
-    .hero p {
-        font-size: 20px;
-        opacity: 0.8;
-    }
-    .btn {
-        margin-top: 30px;
-        padding: 15px 35px;
-        background: red;
-        color: white;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 20px;
-        transition: 0.3s;
-    }
-    .btn:hover {
-        background: black;
-        border: 2px solid red;
-    }
-
-    /* Product Section */
-    .products {
-        padding: 70px 40px;
-    }
-    .products h3 {
-        text-align: center;
-        margin-bottom: 50px;
-        font-size: 36px;
-    }
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 30px;
-    }
-    .card {
-        background: rgba(255,255,255,0.05);
-        padding: 20px;
-        border-radius: 12px;
-        text-align: center;
-        backdrop-filter: blur(8px);
-        transition: 0.3s;
-    }
-    .card:hover {
-        transform: scale(1.03);
-        background: rgba(255,255,255,0.12);
-    }
-    .card img {
-        width: 100%;
-        border-radius: 12px;
-    }
-    .card h4 { margin: 15px 0 5px; }
-    .price {
-        color: #ff3b3b;
-        font-size: 18px;
-        margin-bottom: 10px;
-    }
-
-    /* Video Section */
-    .video-section {
-        padding: 80px 40px;
-        text-align: center;
-        background: rgba(0,0,0,0.3);
-        backdrop-filter: blur(8px);
-    }
-    .video-section h3 {
-        font-size: 36px;
-        margin-bottom: 25px;
-    }
-    .video-frame {
-        width: 90%;
-        max-width: 900px;
-        height: 400px;
-        border-radius: 12px;
-        border: 3px solid red;
-    }
-
-    /* Footer */
-    footer {
-        text-align: center;
-        padding: 25px;
-        margin-top: 50px;
-        background: rgba(0,0,0,0.4);
-    }
-</style>
-
-</head>
-<body>
-
-<!-- Navigation -->
-<nav>
-    <h1>Sharshi Science Heritage</h1>
-    <ul>
-        <li><a href="#hero">Home</a></li>
-        <li><a href="#products">Products</a></li>
-        <li><a href="#video">Videos</a></li>
-        <li><a href="#footer">Contact</a></li>
-    </ul>
-</nav>
-
-<!-- Hero -->
-<section class="hero" id="hero">
-    <h2>The Future of Science & Ecommerce</h2>
-    <p>Innovative. Powerful. Futuristic. Designed for the next generation.</p>
-    <a href="#products" class="btn">Explore Products</a>
-</section>
-
-<!-- Products -->
-<section class="products" id="products">
-    <h3>Featured Futuristic Products</h3>
-
-    <div class="grid">
-        <div class="card">
-            <img src="https://via.placeholder.com/400x250/ff0000/000000?text=Quantum+Device" alt="">
-            <h4>Quantum Energy Device</h4>
-            <p class="price">₹49,999</p>
+        {/* Decorative Line */}
+        <div className="w-full flex justify-center mt-2 mb-6">
+          <div className="h-1 w-3/4 bg-gradient-to-r from-orange-500 via-yellow-300 to-red-600 rounded-full shadow-[0_0_15px_rgba(255,180,80,0.7)]"></div>
         </div>
 
-        <div class="card">
-            <img src="https://via.placeholder.com/400x250/000000/ffffff?text=AI+Assistant" alt="">
-            <h4>AI Smart Assistant</h4>
-            <p class="price">₹29,999</p>
-        </div>
+        {/* Hero Section */}
+        <section className="px-8 py-20 text-center">
+          <h2 className="text-5xl font-bold mb-4 text-white">
+            Welcome to a Modern Indian Futuristic Experience
+          </h2>
+          <p className="text-lg opacity-80 max-w-2xl mx-auto">
+            Blending ancient Indian heritage with futuristic digital design.
+          </p>
+        </section>
 
-        <div class="card">
-            <img src="https://via.placeholder.com/400x250/990000/ffffff?text=Holo+Projector" alt="">
-            <h4>Hologram Projector</h4>
-            <p class="price">₹89,999</p>
+        {/* Features */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 max-w-5xl mx-auto">
+          <div className="bg-gradient-to-br from-blue-700 to-black p-6 rounded-2xl backdrop-blur border border-white/10">
+            <h3 className="text-2xl font-bold mb-2">Authenticity</h3>
+            <p className="opacity-80">Design inspired by traditional Indian art & culture.</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-700 to-black p-6 rounded-2xl backdrop-blur border border-white/10">
+            <h3 className="text-2xl font-bold mb-2">Futuristic Vision</h3>
+            <p className="opacity-80">Modern aesthetics blended with heritage identity.</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-700 to-black p-6 rounded-2xl backdrop-blur border border-white/10">
+            <h3 className="text-2xl font-bold mb-2">Creative Excellence</h3>
+            <p className="opacity-80">Delivering premium-quality digital creations.</p>
+          </div>
+        </section>
+
+        <div className="h-28" />
+      </div>
+    </>
+  );
+}
+
+// Admin Product Management Page
+export function Admin() {
+  return (
+    <div className="min-h-screen w-full bg-gradient-to-b from-black to-blue-900 text-white p-10">
+      <h1 className="text-4xl font-bold mb-6">Product Management Dashboard</h1>
+
+      {/* Add Product Form */}
+      <div className="bg-white/10 p-6 rounded-xl border border-white/20 mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Add New Product</h2>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="text" placeholder="Product Name" className="p-3 rounded bg-black/40 border border-white/20" />
+          <input type="text" placeholder="Category" className="p-3 rounded bg-black/40 border border-white/20" />
+          <input type="number" placeholder="Price" className="p-3 rounded bg-black/40 border border-white/20" />
+          <input type="file" className="p-3 rounded bg-black/40 border border-white/20" />
+          <textarea placeholder="Description" className="p-3 rounded bg-black/40 border border-white/20 md:col-span-2"></textarea>
+        </form>
+        <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full">Add Product</button>
+      </div>
+
+      {/* Product List */}
+      <div className="bg-white/10 p-6 rounded-xl border border-white/20">
+        <h2 className="text-2xl font-semibold mb-4">Existing Products</h2>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center bg-black/40 p-4 rounded-lg border border-white/10">
+            <span>Sample Product</span>
+            <div className="flex gap-3">
+              <button className="px-4 py-1 bg-green-600 rounded">Edit</button>
+              <button className="px-4 py-1 bg-red-600 rounded">Delete</button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
-
-<!-- Video Section -->
-<section class="video-section" id="video">
-    <h3>Science & Innovation Showcase</h3>
-    <iframe class="video-frame"
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="Sharshi Science Heritage">
-    </iframe>
-</section>
-
-<!-- Footer -->
-<footer id="footer">
-    © 2025 Sharshi Science Heritage • All Rights Reserved
-</footer>
-
-</body>
-</html>
+  );
+}

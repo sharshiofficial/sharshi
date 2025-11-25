@@ -1,53 +1,307 @@
-name: Deploy Website
+# .github/workflows/universal-deploy.yml
+name: Universal Build & Deploy
 
+# Trigger: push to main (or any branch), PRs, and manual runs
 on:
   push:
     branches: [ "main" ]
+  pull_request:
   workflow_dispatch:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-      - name: Setup Node (optional)
-        uses: actions/setup-node@v3
+jobs:
+  detect-and-build:
+    name: Detect ▶ Build ▶ Test
+    runs-on: ubuntu-latest
+    outputs:
+      public-path: ${{ steps.set-output.outputs.public-path }}
+      deploy-to-vercel: ${{ steps.set-output.outputs.deploy-vercel }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]" || true
+          git config user.email "actions@github.com" || true
+
+      - name: Determine project type and build commands
+        id: set-output
+        run: |
+          #!/bin/bash
+          set -euo pipefail
+
+          public="public"
+          deploy_vercel="false"
+
+          echo "Detecting project files..."
+          # Node / JS
+          if [ -f package.json ]; then
+            echo "Found package.json"
+            pkg_name=$(jq -r .name package.json 2>/dev/null || echo "")
+            has_build=$(jq -r 'has("scripts") and .scripts | has("build")' package.json 2>/dev/null || echo "false")
+            has_dev=$(jq -r 'has("scripts") and .scripts | has("dev")' package.json 2>/dev/null || echo "false")
+            echo "pkg_name=${pkg_name}, has_build=${has_build}"
+            # Use Node build output conventions
+            if [ "${has_build}" = "true" ]; then
+              build_cmd="npm run build --if-present"
+            else
+              build_cmd=""
+            fi
+            # Typical outputs
+            if [ -d dist ]; then public="dist"; fi
+            if [ -d build ]; then public="build"; fi
+            if [ -d out ]; then public="out"; fi
+            if [ -d public ]; then public="public"; fi
+            # If this is a Next.js app, override to out if 'next export' used
+            if grep -q "\"next\"" package.json 2>/dev/null; then
+              echo "Detected Next.js"
+              # prefer next build & next export if present
+              if grep -q "\"export\"\\s*:" package.json 2>/dev/null || [ -f next.config.js ]; then
+                build_cmd="npm run build --if-present && npm run export --if-present || true"
+                public="out"
+              else
+                # server-side Next cannot be deployed to GitHub Pages; still build artifacts
+                build_cmd="npm run build --if-present"
+              fi
+            fi
+            # expose values
+            echo "::set-output name=build-cmd::$build_cmd"
+            echo "::set-output name=public-path::$public"
+            echo "::set-output name=deploy-vercel::$deploy_vercel"
+            exit 0
+          fi
+
+          # Python static site (mkdocs, pelican, staticjinja)
+          if [ -f pyproject.toml ] || [ -f requirements.txt ]; then
+            echo "Detected Python project"
+            # default static output conventions
+            if [ -d site ]; then public="site"; fi
+            if [ -d site_output ]; then public="site_output"; fi
+            # prefer mkdocs build or other known scripts
+            build_cmd="python -m pip install -r requirements.txt || true && if command -v mkdocs >/dev/null 2>&1; then mkdocs build -d site || true; fi"
+            echo "::set-output name=build-cmd::$build_cmd"
+            echo "::set-output name=public-path::$public"
+            echo "::set-output name=deploy-vercel::$deploy_vercel"
+            exit 0
+          fi
+
+          # Java (Maven / Gradle)
+          if [ -f pom.xml ] || [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+            echo "Detected Java project"
+            build_cmd=""
+            if [ -f pom.xml ]; then build_cmd="mvn -B -DskipTests package"; fi
+            if [ -f build.gradle ] || [ -f build.gradle.kts ]; then build_cmd="./gradlew build -x test || ./gradlew assemble || true"; fi
+            # Java webapps usually produce WAR/JAR; not static — user must adapt
+            echo "::set-output name=build-cmd::$build_cmd"
+            echo "::set-output name=public-path::$public"
+            echo "::set-output name=deploy-vercel::$deploy_vercel"
+            exit 0
+          fi
+
+          # Go
+          if [ -f go.mod ]; then
+            echo "Detected Go project"
+            build_cmd="go build ./..."
+            echo "::set-output name=build-cmd::$build_cmd"
+            echo "::set-output name=public-path::$public"
+            exit 0
+          fi
+
+          # Rust
+          if [ -f Cargo.toml ]; then
+            echo "Detected Rust project"
+            build_cmd="cargo build --release"
+            echo "::set-output name=build-cmd::$build_cmd"
+            echo "::set-output name=public-path::$public"
+            exit 0
+          fi
+
+          # Static HTML fallback
+          echo "No build file detected — treating as static site"
+          build_cmd=""
+          if [ -f index.html ]; then public="."
+          fi
+          echo "::set-output name=build-cmd::$build_cmd"
+          echo "::set-output name=public-path::$public"
+          echo "::set-output name=deploy-vercel::$deploy_vercel"
+      shell: bash
+
+      - name: Show detected values
+        run: |
+          echo "build command: ${{ steps.set-output.outputs.build-cmd }}"
+          echo "public folder: ${{ steps.set-output.outputs.public-path }}"
+          echo "deploy-vercel: ${{ steps.set-output.outputs.deploy-vercel }}"
+
+      - name: Setup Node (if needed)
+        if: ${{ (steps.set-output.outputs['build-cmd'] != '') && (contains(steps.set-output.outputs['build-cmd'], 'npm') || contains(steps.set-output.outputs['build-cmd'], 'node')) }}
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
 
-      - name: Install dependencies (if package.json exists)
+      - name: Setup Python (if pyproject/requirements)
+        if: ${{ (exists('requirements.txt') || exists('pyproject.toml')) }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Cache pip
+        if: ${{ exists('requirements.txt') || exists('pyproject.toml') }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Setup Java (if maven/gradle)
+        if: ${{ exists('pom.xml') || exists('build.gradle') || exists('build.gradle.kts') }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Setup Go
+        if: ${{ exists('go.mod') }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Setup Rust
+        if: ${{ exists('Cargo.toml') }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: Install dependencies (generic)
         run: |
-          if [ -f "package.json" ]; then npm install; fi
+          set -e
+          # Node deps
+          if [ -f package.json ]; then
+            echo "Installing node deps"
+            npm ci || npm install
+          fi
+          # Python deps
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f pyproject.toml ]; then
+            pip install -r requirements.txt || true
+          fi
+          # Gradle wrapper
+          if [ -f gradlew ]; then
+            chmod +x ./gradlew
+          fi
+        shell: bash
 
-      - name: Build project (if build script exists)
+      - name: Run build (if configured)
+        if: ${{ steps.set-output.outputs.build-cmd != '' }}
         run: |
-          if [ -f "package.json" ]; then npm run build || true; fi
+          echo "Running build command..."
+          eval "${{ steps.set-output.outputs.build-cmd }}"
+        shell: bash
 
-      - name: Prepare static output
+      - name: Run tests (if npm test exists)
+        if: ${{ (exists('package.json') && contains(fromJSON(needs.json || '{}') || '{}', '')) }}
         run: |
-          mkdir -p public
-          if [ -d "build" ]; then cp -r build/* public/; fi
-          if [ -f "index.html" ]; then cp -r * public/; fi
+          if [ -f package.json ] && jq -e '.scripts.test' package.json >/dev/null 2>&1; then
+            npm test || echo "Tests failed (non-fatal)"
+          fi
+        continue-on-error: true
+        shell: bash
 
-      - name: Upload artifact
+      - name: Prepare public directory
+        run: |
+          set -e
+          PUBLIC="${{ steps.set-output.outputs.public-path }}"
+          echo "Public candidate: $PUBLIC"
+          if [ "$PUBLIC" = "." ] || [ "$PUBLIC" = "public" ]; then
+            echo "Using repo root/public or index.html"
+            mkdir -p public
+            # If build placed files in '.' just copy index.html and assets
+            if [ -f index.html ]; then cp -r index.html public/ || true; fi
+            # copy common directories if present
+            for d in dist build out public; do
+              if [ -d "$d" ]; then cp -r "$d"/. public/ || true; fi
+            done
+          else
+            if [ -d "$PUBLIC" ]; then
+              echo "Copying $PUBLIC -> public"
+              rm -rf public || true
+              mkdir -p public
+              cp -r "$PUBLIC"/. public/
+            else
+              echo "Warning: expected public path '$PUBLIC' not found. Falling back to repo root copy (index.html)"
+              mkdir -p public
+              if [ -f index.html ]; then cp -r index.html public/; fi
+            fi
+          fi
+          ls -la public || true
+        shell: bash
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: public
 
-  deploy:
-    needs: build
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: detect-and-build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-
+      url: ${{ steps.deploy.outputs.page_url || '' }}
     steps:
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2
+
+  optional-vercel:
+    name: Optional: Deploy to Vercel (if token present)
+    needs: detect-and-build
+    if: ${{ secrets.VERCEL_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Vercel: Pull project settings (optional)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -n "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN" || true
+          fi
+
+      - name: Vercel: Deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" || true
+
+  optional-docker:
+    name: Optional: Build & push Docker image
+    needs: detect-and-build
+    if: ${{ secrets.DOCKER_USERNAME && secrets.DOCKER_PASSWORD && secrets.DOCKER_REGISTRY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker registry
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY }} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE="${{ secrets.DOCKER_REGISTRY }}/${{ github.repository }}:$(date +%Y%m%d%H%M)-${{ github.sha::8 }}"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"

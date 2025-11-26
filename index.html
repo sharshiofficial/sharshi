@@ -1,62 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sharshi Science Heritage</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Rajdhani', sans-serif;
-        background-color: #000;
-        color: white;
-      }
-      h1, h2, h3, h4, h5, h6, .brand-font {
-        font-family: 'Orbitron', sans-serif;
-      }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #0f0f0f;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #450a0a;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #7f1d1d;
-      }
-    </style>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'sci-red': '#ff0033',
-              'sci-dark': '#0a0a0a',
-            }
-          }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharshi Science Heritage – Futuristic Innovation & Ecommerce</title>
+<style>
+    :root{ --red:#ff1a1a; --dark:#000; --glass: rgba(255,255,255,0.06);} 
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: radial-gradient(circle at top, #ff0000 0%, #000000 60%);
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* NAVIGATION */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 50px;
+        background: rgba(0,0,0,0.4);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo {
+        font-size: 28px;
+        font-weight: 800;
+        color: #ff2f2f;
+        text-shadow: 0 0 10px #ff0000;
+    }
+    .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        margin: 0;
+        padding: 0;
+    }
+    .nav-links a {
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        position: relative;
+        transition: 0.3s;
+        padding: 6px 8px;
+        border-radius: 6px;
+    }
+    .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--red);
+        transition: 0.3s;
+    }
+    .nav-links a:hover::after, .nav-links a.active::after {
+        width: 100%;
+    }
+    .nav-links a.active{
+        box-shadow: 0 0 12px rgba(255,0,0,0.12);
+        background: linear-gradient(90deg, rgba(255,0,0,0.06), transparent);
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #1a0000, #000000);
+        position: relative;
+    }
+    .hero-section::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        animation: fadeIn 1.8s ease;
+        max-width: 900px;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .hero-content h1 span {
+        color: var(--red);
+        text-shadow: 0 0 10px #ff0000;
+    }
+    .btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 14px 40px;
+        background: linear-gradient(45deg, #ff0000, #7a0000);
+        color: #fff;
+        font-size: 18px;
+        border-radius: 50px;
+        box-shadow: 0 0 15px #ff00006b;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px #ff0000;
+    }
+
+    /* SECTIONS */
+    section {
+        padding: 80px 30px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    h2 {
+        font-size: 40px;
+        text-shadow: 0 0 8px #ff0000;
+        margin: 0 0 10px 0;
+    }
+
+    /* ADVANCED CARDS */
+    .about-grid, .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .about-card, .product-card {
+        background: var(--glass);
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        transition: 0.4s;
+        transform: translateY(0);
+    }
+    .about-card:hover, .product-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 0 20px rgba(255,0,0,0.2);
+    }
+
+    /* TAX SECTION */
+    .tax-section input { outline: none; }
+
+    /* PARTICLES CANVAS sits behind content */
+    #particles{ z-index: 1; }
+
+    /* FOOTER */
+    .footer-section {
+        background: rgba(0,0,0,0.8);
+        padding: 40px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* small screens */
+    @media (max-width:700px){
+        .navbar{ padding: 14px 20px; }
+        h2{ font-size: 28px; }
+    }
+</style>
+</head>
+<body>
+
+<header id="home" class="hero-section">
+    <nav class="navbar">
+        <div class="logo">Sharshi <span>Science Heritage</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="futuristic_ecommerce.html">Ecommerce</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#mission">Mission</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+            <li><a href="blog.html">Blog</a></li>
+    </nav>
+
+    <div class="hero-content">
+        <h1>Welcome to <span>Sharshi Science Heritage</span></h1>
+        <p>Where futuristic technology meets heritage-inspired innovation.</p>
+        <a class="btn" href="#about">Explore More</a>
+    </div>
+</header>
+
+<section id="about" class="about-section">
+    <h2>About Sharshi Science Heritage</h2>
+    <p>Sharshi Science Heritage is a fusion of futuristic ecommerce, advanced scientific innovation, and preserved ancient knowledge. Our platform brings cutting‑edge technology products, AI‑powered tools, and heritage‑inspired creations into one seamless digital universe.</p>
+
+    <a class="btn" href="futuristic_ecommerce.html" style="margin-bottom:40px;display:inline-block;">Visit Futuristic Ecommerce</a>
+
+<div class="about-grid">
+        <div class="about-card">
+            <h3>🚀 Futuristic Ecommerce System</h3>
+            <p>Experience a next‑generation marketplace featuring quantum tech devices, AI gadgets, smart home systems, and futuristic scientific products.</p>
+        </div>
+
+        <div class="about-card">
+            <h3>🔬 Scientific Innovation</h3>
+            <p>We integrate robotics, AI models, chemical science, physics innovations, and engineering concepts into modern ecommerce experiences.</p>
+        </div>
+
+        <div class="about-card">
+            <h3>📜 Heritage Science Integration</h3>
+            <p>Our platform preserves ancient scientific principles, transforming them into modern lifestyle and digital products.</p>
+        </div>
+    </div>
+</section>
+
+<section id="products" class="products-section">
+    <h2>Featured Products</h2>
+    <div class="product-grid">
+        <div class="product-card"><h3>Quantum Energy Device</h3><p>Portable futuristic tech.</p></div>
+        <div class="product-card"><h3>Natural Heritage Perfumes</h3><p>Inspired by ancient science.</p></div>
+        <div class="product-card"><h3>AI Smart Home Tools</h3><p>Automation powered by intelligence.</p></div>
+    </div>
+</section>
+
+<section id="mission" class="mission-section">
+    <h2>Our Mission</h2>
+    <p>Connecting technology, innovation, and heritage for a better future.</p>
+</section>
+
+<footer id="contact" class="footer-section">
+    <h2>Contact Us</h2>
+    <p>Email: sharshiofficial@gmail.com</p>
+    <p>© 2025 Sharshi Science Heritage — All Rights Reserved.</p>
+</footer>
+
+<!-- USER REVIEWS SECTION -->
+<section id="reviews" class="reviews-section">
+  <h2>User Reviews</h2>
+  <div id="review-list" style="max-width:700px;margin:20px auto;text-align:left;"></div>
+  <div style="max-width:500px;margin:20px auto;">
+    <h3>Submit Your Review</h3>
+    <input id="reviewer" placeholder="Your Name" style="width:100%;padding:10px;border-radius:10px;margin-bottom:10px;border:none;" />
+    <textarea id="reviewText" placeholder="Your Review" style="width:100%;padding:10px;border-radius:10px;border:none;height:120px;"></textarea>
+    <button onclick="submitReview()" class="btn" style="width:100%;margin-top:10px;">Submit Review</button>
+  </div>
+</section>
+
+<!-- WHATSAPP LIVE CHAT BUTTON -->
+<a href="https://wa.me/919999999999" target="_blank" id="chatBtn" style="position:fixed;bottom:25px;right:25px;background:#25D366;padding:15px 20px;border-radius:50px;color:#fff;font-weight:bold;font-size:18px;box-shadow:0 0 12px #25D366;z-index:999;">Chat</a>
+
+<!-- TAX GENERATOR SECTION -->
+<section id="tax" class="tax-section">
+    <h2>Tax Generator</h2>
+    <p>Auto-calculate product price + tax instantly.</p>
+    <div style="max-width:420px;margin:20px auto;background:rgba(255,255,255,0.06);padding:20px;border-radius:15px;backdrop-filter:blur(10px);">
+        <label>Base Price (₹)</label>
+        <input id="price" type="number" min="0" style="width:100%;padding:10px;border-radius:8px;border:none;margin-top:5px;margin-bottom:10px;">
+
+        <label>Tax %</label>
+        <input id="taxpercent" type="number" value="18" min="0" style="width:100%;padding:10px;border-radius:8px;border:none;margin-top:5px;margin-bottom:10px;">
+
+        <button id="genTaxBtn" style="width:100%;padding:12px;border:none;border-radius:10px;background:var(--red);color:#fff;font-size:18px;cursor:pointer;">Generate Total</button>
+
+        <h3 id="total" style="margin-top:20px;text-shadow:0 0 8px #ff0000;"></h3>
+    </div>
+</section>
+
+
+<!-- FUTURISTIC PARTICLE EFFECT -->
+<canvas id="particles"></canvas>
+<script>
+// Particles setup (kept lightweight)
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+canvas.style.position = "fixed";
+canvas.style.top = 0;
+canvas.style.left = 0;
+canvas.style.width = "100%";
+canvas.style.height = "100%";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = 0; // behind content
+
+function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+let particles = [];
+function initParticles(){
+    particles = [];
+    const count = Math.max(60, Math.floor(window.innerWidth/12));
+    for(let i=0;i<count;i++){
+        particles.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            size: Math.random()*2+0.6,
+            speedX: Math.random()*0.6-0.3,
+            speedY: Math.random()*0.6-0.3,
+            alpha: Math.random()*0.6+0.2
+        });
+    }
+}
+initParticles();
+
+function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,0,0,${p.alpha})`;
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if(p.x<0) p.x = canvas.width;
+        if(p.x>canvas.width) p.x = 0;
+        if(p.y<0) p.y = canvas.height;
+        if(p.y>canvas.height) p.y = 0;
+    });
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+window.addEventListener('resize', ()=>{ initParticles(); });
+</script>
+
+<!-- SMOOTH SCROLL + SCROLL REVEAL ANIMATIONS (FIXED: guard invalid selectors) -->
+<script>
+// Helper: safe selector target
+function getTargetElement(href){
+    if(!href || href === '#' || href.trim() === '') return null;
+    // href may be like '#about'
+    try{
+        const id = href.startsWith('#') ? href.slice(1) : href;
+        if(!id) return null;
+        return document.getElementById(id);
+    }catch(e){
+        return null;
+    }
+}
+
+// Smooth scrolling for valid menu links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener("click", function(e){
+        const href = this.getAttribute('href');
+        const target = getTargetElement(href);
+        if(!target){
+            // if there's no valid target, allow default behaviour (or prevent)
+            e.preventDefault();
+            return;
         }
-      }
-    </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
-  }
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+// Scroll Reveal Animation
+const revealElements = document.querySelectorAll("section, .about-card, .product-card");
+function revealOnScroll(){
+    const windowHeight = window.innerHeight;
+    revealElements.forEach(el => {
+        const position = el.getBoundingClientRect().top;
+        if(position < windowHeight - 100){
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+        }
+    });
+}
+window.addEventListener("scroll", revealOnScroll);
+window.addEventListener("load", revealOnScroll);
+</script>
+
+<!-- ACTIVE NAV LINK SCRIPT -->
+<script>
+const sections = document.querySelectorAll('section[id]'); // only sections with id
+const navLinks = document.querySelectorAll('.nav-links a');
+
+function updateActiveNav(){
+    let current = '';
+    const top = window.scrollY;
+    sections.forEach(sec => {
+        const offset = sec.offsetTop - 160;
+        const height = sec.offsetHeight;
+        if(top >= offset && top < offset + height){ current = sec.getAttribute('id'); }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        if(href && href.startsWith('#')){
+            const id = href.slice(1);
+            if(id === current) link.classList.add('active');
+        }
+    });
+}
+window.addEventListener('scroll', updateActiveNav);
+window.addEventListener('load', updateActiveNav);
+
+// Tax generator
+function generateTax(){
+    const price = parseFloat(document.getElementById('price').value) || 0;
+    const tax = parseFloat(document.getElementById('taxpercent').value) || 0;
+    const total = price + (price * (tax/100));
+    document.getElementById('total').innerText = `Total Amount: ₹${total.toFixed(2)}`;
+}
+
+// Attach click handler safely
+const genBtn = document.getElementById('genTaxBtn');
+if(genBtn) genBtn.addEventListener('click', generateTax);
+</script>
+<script>
+// Review Submission
+function submitReview(){
+  const name = document.getElementById('reviewer').value.trim();
+  const text = document.getElementById('reviewText').value.trim();
+  if(!name || !text){ alert('Please fill all fields'); return; }
+  const list = document.getElementById('review-list');
+  const pending = document.createElement('div');
+  pending.style.padding = '10px';
+  pending.style.margin = '10px 0';
+  pending.style.background = 'rgba(255,255,255,0.06)';
+  pending.style.borderRadius = '10px';
+  pending.innerHTML = `<strong>${name}</strong><p>${text}</p><small>Awaiting admin approval</small>`;
+  list.appendChild(pending);
+  document.getElementById('reviewer').value = '';
+  document.getElementById('reviewText').value = '';
 }
 </script>
-</head>
-  <body>
-    <div id="root"></div>
-  </body>
+</body>
 </html>

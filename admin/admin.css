@@ -1,0 +1,132 @@
+/* admin.css — Futuristic Admin UI for Sharshi Science Heritage */
+:root{
+  --bg:#060405;
+  --panel: rgba(255,255,255,0.04);
+  --glass: rgba(255,255,255,0.03);
+  --accent: #ff1a1a;
+  --accent-2: #ff6b6b;
+  --muted: rgba(255,255,255,0.6);
+  --success: #2ecc71;
+  --danger: #ff3b3b;
+  --glass-border: rgba(255,255,255,0.06);
+  --radius: 12px;
+  --glass-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+/* Base layout */
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:Inter, 'Segoe UI', system-ui, -apple-system, Arial;
+  background: linear-gradient(180deg, #0b0000 0%, #1a0000 60%);
+  color:#fff;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.admin-wrap{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  min-height:100vh;
+  gap:24px;
+}
+
+/* Sidebar */
+.admin-sidebar{
+  padding:28px 18px;
+  background: linear-gradient(180deg,var(--panel), rgba(255,255,255,0.02));
+  border-right:1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+.admin-logo{
+  font-weight:800;font-size:20px;color:var(--accent);text-shadow:0 0 14px rgba(255,0,0,0.12);
+  margin-bottom:18px;
+}
+.admin-nav{display:flex;flex-direction:column;gap:10px;}
+.admin-nav a{
+  display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;
+  transition:all .18s ease;
+}
+.admin-nav a:hover{background:linear-gradient(90deg, rgba(255,0,0,0.06), transparent);color:#fff;transform:translateX(4px);}
+.admin-nav a.active{background:linear-gradient(90deg,var(--accent) 0%, var(--accent-2) 100%);box-shadow:0 6px 18px rgba(255,0,0,0.12);color:#fff;}
+
+/* Main area */
+.admin-main{
+  padding:28px;overflow:auto;
+}
+.admin-header{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;
+}
+.admin-header h2{margin:0;font-size:20px;}
+.admin-actions{display:flex;gap:12px;align-items:center}
+
+/* Cards & panels */
+.panel{
+  background:var(--glass);
+  border-radius:var(--radius);
+  padding:18px;
+  border:1px solid var(--glass-border);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+.grid-2{display:grid;grid-template-columns: repeat(2, 1fr); gap:18px;}
+.grid-3{display:grid;grid-template-columns: repeat(3, 1fr); gap:18px;}
+
+/* Reviews list */
+.review-list{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.review-item{
+  display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+  padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.04);
+}
+.review-meta{min-width:200px}
+.review-meta strong{display:block;color:var(--accent);}
+.review-body{flex:1;color:var(--muted);padding:6px 10px}
+.review-status{display:flex;gap:8px;align-items:center}
+.btn{
+  display:inline-block;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;
+}
+.btn-approve{background:linear-gradient(90deg,var(--success), #22b573);color:#021;box-shadow:0 6px 18px rgba(46,204,113,0.08)}
+.btn-delete{background:linear-gradient(90deg,var(--danger), #ff6b6b);color:white;box-shadow:0 6px 18px rgba(255,59,59,0.08)}
+.btn-edit{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+/* Controls */
+.search-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.input{background:rgba(0,0,0,0.4);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);color:#fff;min-width:220px}
+.select{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+
+/* Table */
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th,.table td{padding:12px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left}
+.table th{color:var(--muted);font-weight:700}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999}
+.modal{width:760px;max-width:92%;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:18px;border-radius:12px;border:1px solid var(--glass-border);}
+.modal h3{margin-top:0}
+.modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+
+/* Tiny utilities */
+.kpi{display:flex;gap:12px;align-items:center}
+.kpi-card{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);min-width:140px}
+
+/* Responsive */
+@media (max-width:900px){
+  .admin-wrap{grid-template-columns: 1fr;}
+  .admin-sidebar{display:flex;overflow:auto;padding:12px;}
+  .grid-2, .grid-3{grid-template-columns:1fr}
+}
+
+/* Scrollbar (neat) */
+.admin-main::-webkit-scrollbar{width:10px}
+.admin-main::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--accent),var(--accent-2));border-radius:20px}
+
+/* small helper animations */
+.fade-in{animation:fadeInPanel .6s ease both}
+@keyframes fadeInPanel{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* Floating admin quick action */
+.quick-action{position:fixed;bottom:28px;left:28px;background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:12px 16px;border-radius:14px;color:#fff;box-shadow:0 12px 30px rgba(255,0,0,0.12);z-index:999}
+
+/* Empty state */
+.empty{padding:30px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);color:var(--muted);text-align:center}

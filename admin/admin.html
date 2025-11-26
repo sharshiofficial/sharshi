@@ -1,87 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<style>
+body {
+  background: linear-gradient(135deg, #000000, #8b0000);
+  color: #fff;
+}
+.admin-sidebar {
+  background: linear-gradient(180deg, #000000, #660000);
+}
+.panel {
+  background: rgba(20, 0, 0, 0.55) !important;
+  border: 1px solid #990000 !important;
+}
+.btn {
+  background: linear-gradient(135deg, #330000, #cc0000) !important;
+  color: #fff !important;
+}
+.input, .select {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid #aa0000;
+  color: #fff;
+}
+</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel – Sharshi Science Heritage</title>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-    <div class="admin-container">
-        <aside class="sidebar">
-            <h2 class="logo">SSH Admin</h2>
-            <nav>
-                <a href="#dashboard" class="active">Dashboard</a>
-                <a href="#reviews">User Reviews</a>
-                <a href="#orders">Orders</a>
-                <a href="#products">Products</a>
-                <a href="#blog">Blog Manager</a>
-                <a href="index.html" class="logout">Back to Home</a>
-            </nav>
-        </aside>
 
-        <main class="content">
-            <section id="dashboard" class="section active">
-                <h1>Dashboard Overview</h1>
-                <div class="stats-grid">
-                    <div class="card stat-card"><h3>120</h3><p>Total Orders</p></div>
-                    <div class="card stat-card"><h3>48</h3><p>Pending Reviews</p></div>
-                    <div class="card stat-card"><h3>12</h3><p>New Messages</p></div>
-                </div>
-            </section>
-
-            <section id="reviews" class="section">
-                <h1>User Reviews Moderation</h1>
-                <div class="card review-item">
-                    <h3>Rohan Sharma</h3>
-                    <p>"Amazing futuristic website and great products!"</p>
-                    <button class="approve">Approve</button>
-                    <button class="delete">Delete</button>
-                </div>
-
-                <div class="card review-item">
-                    <h3>Anjali Verma</h3>
-                    <p>"Loved the UI and fast delivery!"</p>
-                    <button class="approve">Approve</button>
-                    <button class="delete">Delete</button>
-                </div>
-            </section>
-
-            <section id="orders" class="section">
-                <h1>Orders Management</h1>
-                <div class="card order-item">
-                    <h3>Order #1023</h3>
-                    <p>Status: <strong>Processing</strong></p>
-                    <button class="update">Update</button>
-                </div>
-            </section>
-
-            <section id="products" class="section">
-                <h1>Products Management</h1>
-                <button class="add-product">+ Add New Product</button>
-            </section>
-
-            <section id="blog" class="section">
-                <h1>Blog Manager</h1>
-                <button class="add-post">+ Create New Blog Post</button>
-            </section>
-        </main>
+<div class="admin-wrap">
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">Sharshi Admin</div>
+        <nav class="admin-nav">
+            <a href="#dashboard" class="active">Dashboard</a>
+            <a href="#reviews">User Reviews</a>
+            <a href="#orders">Orders</a>
+            <a href="#products">Products</a>
+            <a href="#blog">Blog Manager</a>
+            <a href="index.html" style="margin-top:12px;color:var(--muted);">Back to Site</a>
+            <a href="#logout" style="margin-top:8px;color:var(--muted);">Logout</a>
+        </nav>
     </div>
 
-    <script>
-        // Sidebar navigation handler
-        document.querySelectorAll('.sidebar a').forEach(link => {
-            link.addEventListener('click', e => {
-                if (link.hash) {
-                    e.preventDefault();
-                    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-                    document.querySelector(link.hash).classList.add('active');
+    <!-- MAIN -->
+    <div class="admin-main">
 
-                    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-                    link.classList.add('active');
-                }
-            });
+        <!-- HEADER -->
+        <div class="admin-header">
+            <h2 id="pageTitle">Dashboard</h2>
+            <div class="admin-actions">
+                <input id="searchInput" class="input" placeholder="Search...">
+                <button class="btn btn-edit" id="btnOpenLogin">Admin Login</button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="panel fade-in">
+            <div class="kpi">
+                <div class="kpi-card panel"><strong id="k-orders">0</strong><div style="opacity:.85">Total Orders</div></div>
+                <div class="kpi-card panel"><strong id="k-reviews">0</strong><div style="opacity:.85">Pending Reviews</div></div>
+                <div class="kpi-card panel"><strong id="k-messages">0</strong><div style="opacity:.85">Messages</div></div>
+            </div>
+            <div style="margin-top:18px;" id="recentActivity"></div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div id="reviewsSection" class="panel" style="margin-top:18px;">
+            <h3>User Reviews Moderation</h3>
+            <div class="search-row">
+                <input id="filterReviewer" class="input" placeholder="Filter by reviewer...">
+                <select id="filterStatus" class="select"><option value="all">All</option><option value="pending">Pending</option><option value="approved">Approved</option></select>
+            </div>
+
+            <div id="reviewList" class="review-list"></div>
+        </div>
+
+        <!-- ORDERS -->
+        <div id="orders" class="panel" style="margin-top:18px;display:none;">
+            <h3>Orders</h3>
+            <div id="ordersList"></div>
+        </div>
+
+        <!-- PRODUCTS MANAGEMENT (Add/Edit) -->
+        <div id="productsSection" class="panel" style="margin-top:18px;display:none;">
+            <h3>Products Management</h3>
+            <button class="btn btn-edit" id="btnAddProduct">+ Add New Product</button>
+
+            <div id="productsList" style="margin-top:12px;"></div>
+
+            <!-- Product Form (hidden by default) -->
+            <div id="productForm" style="margin-top:12px;display:none;">
+                <div class="panel">
+                    <h4 id="productFormTitle">Add Product</h4>
+                    <input class="input" id="prodName" placeholder="Product Name">
+                    <input class="input" id="prodPrice" type="number" placeholder="Price (₹)">
+                    <input class="input" id="prodImage" placeholder="Image URL">
+                    <textarea class="input" id="prodDesc" placeholder="Short description" style="height:90px"></textarea>
+                    <div style="display:flex;gap:10px;margin-top:10px;">
+                        <button class="btn btn-approve" id="saveProductBtn">Save</button>
+                        <button class="btn btn-delete" id="cancelProductBtn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOG MANAGER (Add/Edit) -->
+        <div id="blogSection" class="panel" style="margin-top:18px;display:none;">
+            <h3>Blog Manager</h3>
+            <button class="btn btn-edit" id="btnAddPost">+ Create New Blog Post</button>
+
+            <div id="postsList" style="margin-top:12px;"></div>
+
+            <div id="postForm" style="margin-top:12px;display:none;">
+                <div class="panel">
+                    <h4 id="postFormTitle">Create Post</h4>
+                    <input class="input" id="postTitle" placeholder="Post Title">
+                    <input class="input" id="postImage" placeholder="Image URL">
+                    <textarea class="input" id="postBody" placeholder="Post body" style="height:140px"></textarea>
+                    <div style="display:flex;gap:10px;margin-top:10px;">
+                        <button class="btn btn-approve" id="savePostBtn">Publish</button>
+                        <button class="btn btn-delete" id="cancelPostBtn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="loginModal" class="modal-backdrop" style="display:none;">
+    <div class="modal">
+        <h3>Admin Login</h3>
+        <input id="adminUser" class="input" placeholder="Username" style="width:100%;margin-top:10px">
+        <input id="adminPass" class="input" type="password" placeholder="Password" style="width:100%;margin-top:10px">
+        <div class="actions" style="margin-top:12px;">
+            <button id="loginBtn" class="btn btn-approve">Login</button>
+            <button id="loginCancel" class="btn btn-delete" style="margin-left:8px">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* Admin functionality: uses localStorage for persistence (products, posts, reviews, orders). This is a frontend-only admin mock. */
+(function(){
+    // Utility
+    function $(id){return document.getElementById(id);}    
+    function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+    function load(key, def){ const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
+
+    // Data stores
+    let products = load('ssh_products', []);
+    let posts = load('ssh_posts', []);
+    let reviews = load('ssh_reviews', []);
+    let orders = load('ssh_orders', []);
+
+    // Elements
+    const reviewListEl = $('reviewList');
+    const productsListEl = $('productsList');
+    const postsListEl = $('postsList');
+    const ordersListEl = $('ordersList');
+
+    // Dashboard KPIs
+    function refreshKpis(){
+        $('k-orders').innerText = orders.length;
+        $('k-reviews').innerText = reviews.filter(r=>r.status==='pending').length;
+        $('k-messages').innerText = 0;
+    }
+
+    // Render Reviews
+    function renderReviews(){
+        reviewListEl.innerHTML = '';
+        const filterReviewer = $('filterReviewer').value.toLowerCase();
+        const filterStatus = $('filterStatus').value;
+        const list = reviews.filter(r=>{
+            if(filterStatus!=='all' && r.status !== filterStatus) return false;
+            if(filterReviewer && !r.name.toLowerCase().includes(filterReviewer)) return false;
+            return true;
         });
-    </script>
+        if(list.length===0){ reviewListEl.innerHTML = '<div class="empty">No reviews</div>'; return; }
+        list.forEach((r, idx)=>{
+            const div = document.createElement('div'); div.className='review-item';
+            div.innerHTML = `<div class="review-meta"><strong>${r.name}</strong><div style="opacity:.9">${r.date}</div></div>
+                             <div class="review-body">${r.text}</div>
+                             <div class="review-status">
+                                <button class="btn btn-approve" data-idx="${idx}">Approve</button>
+                                <button class="btn btn-delete" data-idx="${idx}">Delete</button>
+                             </div>`;
+            reviewListEl.appendChild(div);
+        });
+        // attach handlers
+        reviewListEl.querySelectorAll('.btn-approve').forEach(b=>b.addEventListener('click', (e)=>{
+            const i = parseInt(e.currentTarget.dataset.idx);
+            reviews[i].status = 'approved'; save('ssh_reviews', reviews); renderReviews(); refreshKpis();
+        }));
+        reviewListEl.querySelectorAll('.btn-delete').forEach(b=>b.addEventListener('click', (e)=>{
+            const i = parseInt(e.currentTarget.dataset.idx);
+            if(confirm('Delete this review?')){ reviews.splice(i,1); save('ssh_reviews', reviews); renderReviews(); refreshKpis(); }
+        }));
+    }
+
+    // Render Products
+    function renderProducts(){
+        productsListEl.innerHTML = '';
+        if(products.length===0) productsListEl.innerHTML = '<div class="empty">No products yet</div>';
+        products.forEach((p, idx)=>{
+            const card = document.createElement('div'); card.className='panel'; card.style.marginBottom='10px';
+            card.innerHTML = `<div style="display:flex;gap:12px;align-items:center">
+                <img src="${p.image||'https://via.placeholder.com/120'}" style="width:120px;border-radius:8px;object-fit:cover" />
+                <div style="flex:1">
+                  <strong>${p.name}</strong>
+                  <div style="opacity:.9">₹${p.price.toFixed(2)}</div>
+                  <div style="margin-top:6px;color:var(--muted)">${p.desc}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <button class="btn btn-approve" data-idx="${idx}">Edit</button>
+                  <button class="btn btn-delete" data-idxdel="${idx}">Delete</button>
+                </div>
+            </div>`;
+            productsListEl.appendChild(card);
+        });
+        // handlers
+        productsListEl.querySelectorAll('[data-idx]').forEach(b=>b.addEventListener('click', e=>{
+            const i = parseInt(e.currentTarget.dataset.idx);
+            openProductForm(products[i], i);
+        }));
+        productsListEl.querySelectorAll('[data-idxdel]').forEach(b=>b.addEventListener('click', e=>{
+            const i = parseInt(e.currentTarget.dataset.idxdel);
+            if(confirm('Delete product?')){ products.splice(i,1); save('ssh_products', products); renderProducts(); }
+        }));
+    }
+
+    // Product Form
+    const productFormEl = $('productForm');
+    const prodName = $('prodName'); const prodPrice = $('prodPrice'); const prodImage = $('prodImage'); const prodDesc = $('prodDesc');
+    let editIndex = -1;
+    function openProductForm(product, idx){
+        productFormEl.style.display='block';
+        $('productFormTitle').innerText = product ? 'Edit Product' : 'Add Product';
+        if(product){ prodName.value=product.name; prodPrice.value=product.price; prodImage.value=product.image; prodDesc.value=product.desc; editIndex = idx; }
+        else { prodName.value=''; prodPrice.value=''; prodImage.value=''; prodDesc.value=''; editIndex = -1; }
+    }
+    $('btnAddProduct').addEventListener('click', ()=> openProductForm(null,-1));
+    $('cancelProductBtn').addEventListener('click', ()=> productFormEl.style.display='none');
+    $('saveProductBtn').addEventListener('click', ()=>{
+        const name = prodName.value.trim(); const price = parseFloat(prodPrice.value)||0; const image = prodImage.value.trim(); const desc = prodDesc.value.trim();
+        if(!name){ alert('Name required'); return; }
+        const obj = { name, price, image, desc };
+        if(editIndex>-1){ products[editIndex]=obj; } else { products.push(obj); }
+        save('ssh_products', products); productFormEl.style.display='none'; renderProducts();
+    });
+
+    // Render Posts (Blog)
+    function renderPosts(){
+        postsListEl.innerHTML='';
+        if(posts.length===0) postsListEl.innerHTML = '<div class="empty">No posts yet</div>';
+        posts.forEach((p, idx)=>{
+            const card = document.createElement('div'); card.className='panel'; card.style.marginBottom='10px';
+            card.innerHTML = `<strong>${p.title}</strong><div style="opacity:.85;margin:6px 0">${p.date}</div>
+                              <div style="color:var(--muted)">${p.body.substring(0,140)}...</div>
+                              <div style="margin-top:8px;display:flex;gap:8px"><button class="btn btn-approve" data-edit="${idx}">Edit</button><button class="btn btn-delete" data-del="${idx}">Delete</button></div>`;
+            postsListEl.appendChild(card);
+        });
+        postsListEl.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', e=>{
+            openPostForm(posts[parseInt(e.currentTarget.dataset.edit)], parseInt(e.currentTarget.dataset.edit));
+        }));
+        postsListEl.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{
+            const i = parseInt(e.currentTarget.dataset.del); if(confirm('Delete post?')){ posts.splice(i,1); save('ssh_posts', posts); renderPosts(); }
+        }));
+    }
+
+    // Post Form
+    const postFormEl = $('postForm'); const postTitle = $('postTitle'); const postImage = $('postImage'); const postBody = $('postBody');
+    let editPostIdx = -1;
+    function openPostForm(post, idx){ postFormEl.style.display='block'; $('postFormTitle').innerText = post ? 'Edit Post' : 'Create Post';
+        if(post){ postTitle.value=post.title; postImage.value=post.image; postBody.value=post.body; editPostIdx=idx; } else { postTitle.value=''; postImage.value=''; postBody.value=''; editPostIdx=-1; }
+    }
+    $('btnAddPost').addEventListener('click', ()=> openPostForm(null,-1));
+    $('cancelPostBtn').addEventListener('click', ()=> postFormEl.style.display='none');
+    $('savePostBtn').addEventListener('click', ()=>{
+        const title = postTitle.value.trim(); const image = postImage.value.trim(); const body = postBody.value.trim();
+        if(!title || !body){ alert('Title and body required'); return; }
+        const obj = { title, image, body, date: new Date().toLocaleString() };
+        if(editPostIdx>-1) posts[editPostIdx]=obj; else posts.push(obj);
+        save('ssh_posts', posts); postFormEl.style.display='none'; renderPosts();
+    });
+
+    // Orders (mock)
+    function renderOrders(){ ordersListEl.innerHTML=''; if(orders.length===0) ordersListEl.innerHTML='<div class="empty">No orders</div>'; orders.forEach((o,idx)=>{ const d = document.createElement('div'); d.className='panel'; d.style.marginBottom='10px'; d.innerHTML=`<strong>Order #${o.id}</strong><div>${o.items.map(i=>i.name).join(', ')}</div><div style="margin-top:8px"><button class="btn btn-edit" data-idx="${idx}">Update</button></div>`; ordersListEl.appendChild(d); }); }
+
+    // Initial render
+    renderReviews(); renderProducts(); renderPosts(); renderOrders(); refreshKpis();
+
+    // Load review submissions from site reviews localStorage (if any)
+    // Allow admin to approve/delete
+    // Provide a way for site to push reviews: other pages can push to 'ssh_reviews' key
+
+    // Wire up filter inputs
+    $('filterReviewer').addEventListener('input', renderReviews);
+    $('filterStatus').addEventListener('change', renderReviews);
+
+    // Sidebar nav activation
+    document.querySelectorAll('.admin-nav a').forEach(link=>{
+        link.addEventListener('click', e=>{
+            e.preventDefault(); document.querySelectorAll('.admin-nav a').forEach(a=>a.classList.remove('active')); link.classList.add('active');
+            // hide all main panels
+            document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+            const href = link.getAttribute('href').replace('#','');
+            if(href==='dashboard'){ document.getElementById('dashboard').style.display='block'; $('pageTitle').innerText='Dashboard'; }
+            if(href==='reviews'){ document.getElementById('reviewsSection').style.display='block'; $('pageTitle').innerText='Reviews'; }
+            if(href==='orders'){ document.getElementById('orders').style.display='block'; $('pageTitle').innerText='Orders'; }
+            if(href==='products'){ document.getElementById('productsSection').style.display='block'; $('pageTitle').innerText='Products'; }
+            if(href==='blog'){ document.getElementById('blogSection').style.display='block'; $('pageTitle').innerText='Blog Manager'; }
+        });
+    });
+
+    // Admin login modal
+    $('btnOpenLogin').addEventListener('click', ()=>$('loginModal').style.display='flex');
+    $('loginCancel').addEventListener('click', ()=>$('loginModal').style.display='none');
+    $('loginBtn').addEventListener('click', ()=>{
+        const u = $('adminUser').value.trim(); const p = $('adminPass').value;
+        // Simple demo credential - change as needed
+        if(u==='admin' && p==='password'){ alert('Logged in as admin'); $('loginModal').style.display='none'; }
+        else alert('Invalid credentials (demo: admin / password)');
+    });
+
+    // Demo: allow site to push a sample review if none exist
+    if(reviews.length===0){ reviews.push({ name:'Demo User', text:'Great site!', status:'pending', date:new Date().toLocaleString() }); save('ssh_reviews', reviews); renderReviews(); refreshKpis(); }
+
+    // Search input (simple local search across products/posts)
+    $('searchInput').addEventListener('input', (e)=>{
+        const q = e.target.value.toLowerCase();
+        // show matching in recentActivity
+        const matches = [];
+        products.forEach(p=>{ if(p.name.toLowerCase().includes(q) || (p.desc||'').toLowerCase().includes(q)) matches.push(`Product: ${p.name}`); });
+        posts.forEach(p=>{ if(p.title.toLowerCase().includes(q) || (p.body||'').toLowerCase().includes(q)) matches.push(`Post: ${p.title}`); });
+        recentActivity.innerHTML = matches.length ? '<div class="panel">'+matches.join('<br>')+'</div>' : '';
+    });
+
+    // Expose some functions for console debugging
+    window.sshAdmin = { products, posts, reviews, orders, saveAll: ()=>{ save('ssh_products', products); save('ssh_posts', posts); save('ssh_reviews', reviews); save('ssh_orders', orders);} };
+
+})();
+</script>
+
 </body>
 </html>

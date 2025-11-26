@@ -1,3 +1,285 @@
+// === ADMIN.JS (Full Futuristic Black-Red Themed Admin Logic) ===
+// Handles: Login • Products • Blog • Reviews • Orders • LocalStorage DB
+
+console.log("Sharshi Science Heritage Admin Loaded ✔");
+
+/******************************
+ *  UTILITY FUNCTIONS
+ ******************************/
+const $ = (id) => document.getElementById(id);
+const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+const load = (key, def) => JSON.parse(localStorage.getItem(key) || JSON.stringify(def));
+
+// Local storage database
+let DB = {
+    products: load("ssh_products", []),
+    posts: load("ssh_posts", []),
+    reviews: load("ssh_reviews", []),
+    orders: load("ssh_orders", [])
+};
+
+function refreshDB() {
+    save("ssh_products", DB.products);
+    save("ssh_posts", DB.posts);
+    save("ssh_reviews", DB.reviews);
+    save("ssh_orders", DB.orders);
+}
+
+/******************************
+ *  ADMIN LOGIN SYSTEM
+ ******************************/
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "password"; // You can change
+
+function adminLogin() {
+    const u = $("loginUser").value.trim();
+    const p = $("loginPass").value;
+
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+        localStorage.setItem("ssh_admin_logged", "yes");
+        window.location.href = "admin-dashboard.html";
+    } else {
+        alert("❌ Invalid Login — Try Again");
+    }
+}
+
+function checkAuth() {
+    if (localStorage.getItem("ssh_admin_logged") !== "yes") {
+        window.location.href = "admin-login.html";
+    }
+}
+
+function logoutAdmin() {
+    localStorage.removeItem("ssh_admin_logged");
+    window.location.href = "admin-login.html";
+}
+
+/******************************
+ *  PRODUCT MANAGEMENT
+ ******************************/
+function renderProducts() {
+    const box = $("productList");
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    if (DB.products.length === 0) {
+        box.innerHTML = `<div class='admin-card'>No products added yet.</div>`;
+        return;
+    }
+
+    DB.products.forEach((p, i) => {
+        box.innerHTML += `
+        <div class="admin-card">
+            <h3>${p.name}</h3>
+            <img src="${p.image}" style="width:150px;border-radius:12px;margin-top:10px;">
+            <p style='opacity:.85;margin-top:10px;'>₹${p.price}</p>
+            <p style='margin-top:10px;'>${p.desc}</p>
+            <button class='btn' onclick="editProduct(${i})">Edit</button>
+            <button class='btn' style='background:#800000' onclick="deleteProduct(${i})">Delete</button>
+        </div>`;
+    });
+}
+
+function addProduct() {
+    const obj = {
+        name: $("prodName").value.trim(),
+        price: parseFloat($("prodPrice").value.trim()),
+        image: $("prodImage").value.trim(),
+        desc: $("prodDesc").value.trim()
+    };
+
+    if (!obj.name || !obj.price) return alert("Name & Price required");
+
+    DB.products.push(obj);
+    refreshDB();
+    alert("Product Added ✔");
+    renderProducts();
+}
+
+let editProductIndex = -1;
+
+function editProduct(i) {
+    const p = DB.products[i];
+    editProductIndex = i;
+
+    $("prodName").value = p.name;
+    $("prodPrice").value = p.price;
+    $("prodImage").value = p.image;
+    $("prodDesc").value = p.desc;
+}
+
+function updateProduct() {
+    if (editProductIndex < 0) return alert("No product selected");
+
+    DB.products[editProductIndex] = {
+        name: $("prodName").value.trim(),
+        price: parseFloat($("prodPrice").value.trim()),
+        image: $("prodImage").value.trim(),
+        desc: $("prodDesc").value.trim()
+    };
+
+    refreshDB();
+    alert("Product Updated ✔");
+    renderProducts();
+}
+
+function deleteProduct(i) {
+    if (!confirm("Delete this product?")) return;
+    DB.products.splice(i, 1);
+    refreshDB();
+    renderProducts();
+}
+
+/******************************
+ *  BLOG SYSTEM
+ ******************************/
+function renderPosts() {
+    const box = $("postList");
+    if (!box) return;
+
+    box.innerHTML = "";
+    if (DB.posts.length === 0) {
+        box.innerHTML = `<div class='admin-card'>No blog posts found.</div>`;
+        return;
+    }
+
+    DB.posts.forEach((p, i) => {
+        box.innerHTML += `
+        <div class='admin-card'>
+            <h3>${p.title}</h3>
+            <img src='${p.image}' style='width:150px;border-radius:12px;margin-top:10px;'>
+            <p style="margin-top:10px;opacity:.85">${p.date}</p>
+            <p>${p.body.substring(0,120)}...</p>
+            <button class="btn" onclick="editPost(${i})">Edit</button>
+            <button class="btn" style="background:#800000" onclick="deletePost(${i})">Delete</button>
+        </div>`;
+    });
+}
+
+function addPost() {
+    const obj = {
+        title: $("postTitle").value.trim(),
+        image: $("postImage").value.trim(),
+        body: $("postBody").value.trim(),
+        date: new Date().toLocaleString()
+    };
+
+    if (!obj.title || !obj.body) return alert("Title and Body required");
+
+    DB.posts.push(obj);
+    refreshDB();
+    alert("Blog Published ✔");
+    renderPosts();
+}
+
+let editPostIndex = -1;
+
+function editPost(i) {
+    const p = DB.posts[i];
+    editPostIndex = i;
+
+    $("postTitle").value = p.title;
+    $("postImage").value = p.image;
+    $("postBody").value = p.body;
+}
+
+function updatePost() {
+    if (editPostIndex < 0) return alert("No post selected");
+
+    DB.posts[editPostIndex] = {
+        title: $("postTitle").value.trim(),
+        image: $("postImage").value.trim(),
+        body: $("postBody").value.trim(),
+        date: new Date().toLocaleString()
+    };
+
+    refreshDB();
+    alert("Post Updated ✔");
+    renderPosts();
+}
+
+function deletePost(i) {
+    if (!confirm("Delete this post?")) return;
+    DB.posts.splice(i, 1);
+    refreshDB();
+    renderPosts();
+}
+
+/******************************
+ *  REVIEWS MANAGEMENT
+ ******************************/
+function renderReviews() {
+    const box = $("reviewList");
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    if (DB.reviews.length === 0) {
+        box.innerHTML = `<div class='admin-card'>No reviews yet.</div>`;
+        return;
+    }
+
+    DB.reviews.forEach((r, i) => {
+        box.innerHTML += `
+        <div class='admin-card'>
+            <h3>${r.name}</h3>
+            <p style='opacity:.7'>${r.date}</p>
+            <p>${r.text}</p>
+            <button class="btn" onclick="approveReview(${i})">Approve</button>
+            <button class="btn" style='background:#800000' onclick="deleteReview(${i})">Delete</button>
+        </div>`;
+    });
+}
+
+function approveReview(i) {
+    DB.reviews[i].status = "approved";
+    refreshDB();
+    renderReviews();
+}
+
+function deleteReview(i) {
+    if (!confirm("Delete review?")) return;
+    DB.reviews.splice(i, 1);
+    refreshDB();
+    renderReviews();
+}
+
+/******************************
+ *  ORDERS
+ ******************************/
+function renderOrders() {
+    const box = $("orderList");
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    if (DB.orders.length === 0) {
+        box.innerHTML = `<div class='admin-card'>No orders received.</div>`;
+        return;
+    }
+
+    DB.orders.forEach((o, i) => {
+        box.innerHTML += `
+        <div class='admin-card'>
+            <h3>Order #${o.id}</h3>
+            <p><strong>Items:</strong> ${o.items.map(x=>x.name).join(", ")}</p>
+            <p><strong>Total:</strong> ₹${o.total}</p>
+        </div>`;
+    });
+}
+
+/******************************
+ *  EXPORT DEBUG FUNCTIONS
+ ******************************/
+window.sshAdmin = {
+    DB,
+    refreshDB,
+    addProduct, updateProduct, deleteProduct,
+    addPost, updatePost, deletePost,
+    approveReview, deleteReview,
+    logoutAdmin
+};
 // admin.js - Futuristic Admin Logic for Sharshi Science Heritage
 // This script powers the Admin Panel with localStorage persistence
 

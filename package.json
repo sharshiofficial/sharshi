@@ -1,0 +1,33 @@
+{
+  "name": "sharshi-science-heritage",
+  "version": "1.0.0",
+  "description": "Futuristic ecommerce + admin portal website for Sharshi Science Heritage.",
+  "author": "Sharshi",
+  "license": "MIT",
+
+  "scripts": {
+    "start": "lite-server",
+    "dev": "lite-server",
+    "build:css": "cleancss -o dist/style.min.css style.css",
+    "build:admin-css": "cleancss -o dist/admin.min.css admin/admin.css",
+    "build:js": "uglifyjs script.js -o dist/script.min.js",
+    "build:admin-js": "uglifyjs admin/admin.js -o dist/admin.min.js",
+    "build": "npm run build:css && npm run build:admin-css && npm run build:js && npm run build:admin-js"
+  },
+
+  "devDependencies": {
+    "lite-server": "^2.6.1",
+    "clean-css-cli": "^5.6.2",
+    "uglify-js": "^3.17.4"
+  },
+
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "ecommerce",
+    "futuristic",
+    "admin-panel",
+    "frontend"
+  ]
+}

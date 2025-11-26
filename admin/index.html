@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – Sharshi Science Heritage</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <h2 class="logo">SSH Admin</h2>
+            <nav>
+                <a href="#dashboard" class="active">Dashboard</a>
+                <a href="#reviews">User Reviews</a>
+                <a href="#orders">Orders</a>
+                <a href="#products">Products</a>
+                <a href="#blog">Blog Manager</a>
+                <a href="index.html" class="logout">Back to Home</a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section id="dashboard" class="section active">
+                <h1>Dashboard Overview</h1>
+                <div class="stats-grid">
+                    <div class="card stat-card"><h3>120</h3><p>Total Orders</p></div>
+                    <div class="card stat-card"><h3>48</h3><p>Pending Reviews</p></div>
+                    <div class="card stat-card"><h3>12</h3><p>New Messages</p></div>
+                </div>
+            </section>
+
+            <section id="reviews" class="section">
+                <h1>User Reviews Moderation</h1>
+                <div class="card review-item">
+                    <h3>Rohan Sharma</h3>
+                    <p>"Amazing futuristic website and great products!"</p>
+                    <button class="approve">Approve</button>
+                    <button class="delete">Delete</button>
+                </div>
+
+                <div class="card review-item">
+                    <h3>Anjali Verma</h3>
+                    <p>"Loved the UI and fast delivery!"</p>
+                    <button class="approve">Approve</button>
+                    <button class="delete">Delete</button>
+                </div>
+            </section>
+
+            <section id="orders" class="section">
+                <h1>Orders Management</h1>
+                <div class="card order-item">
+                    <h3>Order #1023</h3>
+                    <p>Status: <strong>Processing</strong></p>
+                    <button class="update">Update</button>
+                </div>
+            </section>
+
+            <section id="products" class="section">
+                <h1>Products Management</h1>
+                <button class="add-product">+ Add New Product</button>
+            </section>
+
+            <section id="blog" class="section">
+                <h1>Blog Manager</h1>
+                <button class="add-post">+ Create New Blog Post</button>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar navigation handler
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', e => {
+                if (link.hash) {
+                    e.preventDefault();
+                    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                    document.querySelector(link.hash).classList.add('active');
+
+                    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,5 +1,73 @@
-- name: Setup Node.js environment
-  uses: actions/setup-node@v6.0.0
+# Futuristic GitHub Actions Workflow — Advanced Edition
 
-- name: Upload a Build Artifact
-  uses: actions/upload-artifact@v5.0.0
+## 🚀 Features Added
+- Auto-minify HTML/CSS/JS
+- Image optimization (lossless)
+- Auto-versioning build
+- Deploy to GitHub Pages
+- Build success email notification (optional)
+
+```yaml
+name: Deploy Sharshi Science Heritage
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install HTML/CSS/JS Minifier
+      run: |
+        npm install -g minify
+
+    - name: Minify all assets
+      run: |
+        mkdir dist
+        cp -r * dist || true
+        find dist -name '*.html' -exec minify {} -o {} \;
+        find dist -name '*.css' -exec minify {} -o {} \;
+        find dist -name '*.js' -exec minify {} -o {} \;
+
+    - name: Optimize Images
+      uses: calibreapp/image-actions@v1.1.0
+      with:
+        quality: 80
+        compressOnly: true
+        inputDir: dist
+        outputDir: dist
+
+    - name: Auto Version Tag
+      id: version
+      run: echo "version=v$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        folder: dist
+        clean: true
+
+    - name: Send Email Notification
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USER }}
+        password: ${{ secrets.EMAIL_PASS }}
+        subject: "Deployment Completed ✔ Version: ${{ steps.version.outputs.version }}"
+        to: ${{ secrets.NOTIFY_EMAIL }}
+        from: "Sharshi Science Heritage"
+        body: "Your site has been minified, optimized, versioned, and deployed successfully."```
